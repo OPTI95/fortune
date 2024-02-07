@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_fortune_wheel/flutter_fortune_wheel.dart';
+import 'package:fortune_app/cubit/fortune_cubit.dart';
+import 'package:fortune_app/play/page/roulette_play_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SpotsPage extends StatefulWidget {
@@ -19,6 +22,7 @@ class _SpotsPageState extends State<SpotsPage> {
 
   int currentSelectedIndex = 0;
   List<bool> itemSelected = List.generate(14, (index) => false);
+  int index = 0;
 
   @override
   void dispose() {
@@ -30,253 +34,101 @@ class _SpotsPageState extends State<SpotsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: LayoutBuilder(builder: (contex, constraints) {
-        List<Widget> items = [
-          Text(
-            "100",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Image.asset(
-            "images/gift_1.png",
-            height: constraints.maxHeight * 0.1,
-            width: constraints.maxWidth * 0.2,
-          ),
-          Text(
-            "50",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Image.asset(
-            "images/gift_2.png",
-            height: constraints.maxHeight * 0.1,
-            width: constraints.maxWidth * 0.2,
-          ),
-          Text(
-            "0",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Image.asset(
-            "images/gift_3.png",
-            height: constraints.maxHeight * 0.1,
-            width: constraints.maxWidth * 0.2,
-          ),
-          Text(
-            "20",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Image.asset(
-            "images/gift_4.png",
-            height: constraints.maxHeight * 0.1,
-            width: constraints.maxWidth * 0.2,
-          ),
-          Text(
-            "0",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Text(
-            "10000",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Text(
-            "20",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Image.asset(
-            "images/gift_1.png",
-            height: constraints.maxHeight * 0.1,
-            width: constraints.maxWidth * 0.2,
-          ),
-          Text(
-            "0",
-            style:
-                GoogleFonts.roboto(fontWeight: FontWeight.w700, fontSize: 16),
-          ),
-          Image.asset(
-            "images/gift_2.png",
-            height: constraints.maxHeight * 0.1,
-            width: constraints.maxWidth * 0.2,
-          ),
-        ];
         return Stack(
           children: [
             ImageBackground(
               constraints: constraints,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 35),
-              child: BackButton(
-                constraints: constraints,
-              ),
+            BackButton(
+              constraints: constraints,
             ),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  TextSpotPokies(
-                    constraints: constraints,
-                  ),
+                  index == 0
+                      ? TextSpotRoulette(
+                          constraints: constraints,
+                        )
+                      : (index == 1
+                          ? TextSpotSlot(
+                              constraints: constraints,
+                            )
+                          : TextSpotPokies(constraints: constraints)),
                   Flexible(
                     flex: 3,
                     child: Row(
+                      mainAxisSize: MainAxisSize.min,
                       children: [
-                        // Spacer(),
-                        // PrevButton(constraints: constraints),
-                        // SizedBox(
-                        //   width: 50,
-                        // ),
+                        const Spacer(),
+                        GestureDetector(
+                            child: IconButton(
+                                iconSize: constraints.maxWidth * 0.06,
+                                onPressed: () {
+                                  if (index != 0) {
+                                    index -= 1;
+                                  }
+                                  setState(() {});
+                                },
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        const MaterialStatePropertyAll(
+                                            Color.fromRGBO(238, 33, 33, 1)),
+                                    side: const MaterialStatePropertyAll(
+                                      BorderSide(
+                                        width: 7,
+                                        color: Color.fromRGBO(190, 23, 23, 1),
+                                      ),
+                                    ),
+                                    shape: MaterialStatePropertyAll(
+                                      RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                    )),
+                                icon: const Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                ))),
+                        const SizedBox(
+                          width: 50,
+                        ),
                         Flexible(
                             flex: 2,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Transform.rotate(
-                                  angle: 90 *
-                                      (pi / 180), // Convert degrees to radians
-                            
-                                  child: Flexible(
-                                      child: FortuneBar(
-                                    selected: selected.stream,
-                                    visibleItemCount: 5,
-                                    height: 200,
-                                    items: [
-                                      for (int index = 0; index < 5; index++)
-                                        FortuneItem(
-                                          child: items[index],
-                                          style: FortuneItemStyle(
-                                            color: itemSelected[index]
-                                                ? Color.fromRGBO(
-                                                    228, 232, 159, 1)
-                                                : Color.fromRGBO(
-                                                    210, 198, 153, 1),
-                                          ),
-                                        ),
-                                    ],
-                                  )),
-                                ),
-                                Transform.rotate(
-                                  angle: 90 *
-                                      (pi / 180), // Convert degrees to radians
-                            
-                                  child: Flexible(
-                                      child: FortuneBar(
-                                    selected: selected.stream,
-                                    visibleItemCount: 5,
-                                    height: 200,
-                                    items: [
-                                      for (int index = 0; index < 5; index++)
-                                        FortuneItem(
-                                          child: items[index],
-                                          style: FortuneItemStyle(
-                                            color: itemSelected[index]
-                                                ? Color.fromRGBO(
-                                                    228, 232, 159, 1)
-                                                : Color.fromRGBO(
-                                                    210, 198, 153, 1),
-                                          ),
-                                        ),
-                                    ],
-                                  )),
-                                ),
-                                // Flexible(
-                                //     child: FortuneBar(
-                                //   selected: selected2.stream,
-                                //   visibleItemCount: 5,
-                                //   height: 200,
-                                //   items: [
-                                //     for (int index = 4; index < 9; index++)
-                                //       FortuneItem(
-                                //         child: items[index],
-                                //         style: FortuneItemStyle(
-                                //           color: itemSelected[index]
-                                //               ? Color.fromRGBO(228, 232, 159, 1)
-                                //               : Color.fromRGBO(
-                                //                   210, 198, 153, 1),
-                                //         ),
-                                //       ),
-                                //   ],
-                                // )),
-                                // Flexible(
-                                //     fit: FlexFit.tight,
-                                //     child: FortuneBar(
-                                //       selected: selected3.stream,
-                                //       visibleItemCount: 5,
-                                //       height: 200,
-                                //       items: [
-                                //         for (int index = 4; index < 9; index++)
-                                //           FortuneItem(
-                                //             child: items[index],
-                                //             style: FortuneItemStyle(
-                                //               color: itemSelected[index]
-                                //                   ? Color.fromRGBO(
-                                //                       228, 232, 159, 1)
-                                //                   : Color.fromRGBO(
-                                //                       210, 198, 153, 1),
-                                //             ),
-                                //           ),
-                                //       ],
-                                //     )),
-                                // Spacer(),
-                            
-                                // Expanded(
-                                //     child: FortuneBar(
-                                //   selected: selected2.stream,
-                                //   visibleItemCount: 3,
-                                //   height: 250,
-                                //   physics: DirectionalPanPhysics.horizontal(),
-                                //   items: [
-                                //     for (int index = 0;
-                                //         index < items.length;
-                                //         index++)
-                                //       FortuneItem(
-                                //         child: items[index],
-                                //         style: FortuneItemStyle(
-                                //           color: itemSelected[index]
-                                //               ? Color.fromRGBO(228, 232, 159, 1)
-                                //               : Color.fromRGBO(
-                                //                   210, 198, 153, 1),
-                                //         ),
-                                //       ),
-                                //   ],
-                                // )),
-                                // Expanded(
-                                //     child: FortuneBar(
-                                //   selected: selected3.stream,
-                                //   visibleItemCount: 3,
-                                //   height: 250,
-                                //   physics: DirectionalPanPhysics.horizontal(),
-                                //   items: [
-                                //     for (int index = 0;
-                                //         index < items.length;
-                                //         index++)
-                                //       FortuneItem(
-                                //         child: items[index],
-                                //         style: FortuneItemStyle(
-                                //           color: itemSelected[index]
-                                //               ? Color.fromRGBO(228, 232, 159, 1)
-                                //               : Color.fromRGBO(
-                                //                   210, 198, 153, 1),
-                                //         ),
-                                //       ),
-                                //   ],
-                                // )),
-                              ],
-                            )),
-                        // child: RouletteWidget(
-                        //     itemSelected: itemSelected,
-                        //     constraints: constraints,
-                        //     items: items,
-                        //     selected: selected,
-                        //     currentSelectedIndex: currentSelectedIndex)),
-                        // SizedBox(
-                        //   width: 50,
-                        // ),
-                        // NextButton(constraints: constraints),
-                        // Spacer(),
+                            child: index == 0
+                                ? ImageRoulette()
+                                : (index == 1 ? ImageSlot() : ImagePokies())),
+                        SizedBox(
+                          width: 50,
+                        ),
+                        GestureDetector(
+                            child: IconButton(
+                                iconSize: constraints.maxWidth * 0.06,
+                                onPressed: () {
+                                  if (index != 3) {
+                                    index += 1;
+                                  }
+                                  setState(() {});
+                                },
+                                style: ButtonStyle(
+                                    backgroundColor:
+                                        const MaterialStatePropertyAll(
+                                            Color.fromRGBO(238, 33, 33, 1)),
+                                    side: const MaterialStatePropertyAll(
+                                      BorderSide(
+                                        width: 7,
+                                        color: Color.fromRGBO(190, 23, 23, 1),
+                                      ),
+                                    ),
+                                    shape: MaterialStatePropertyAll(
+                                      RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(20)),
+                                    )),
+                                icon: const Icon(
+                                  Icons.arrow_forward,
+                                  color: Colors.white,
+                                ))),
+                        const Spacer(),
                       ],
                     ),
                   ),
@@ -285,111 +137,14 @@ class _SpotsPageState extends State<SpotsPage> {
                   ),
                   ButtonPlay(
                     constraints: constraints,
-                    itemSelected: itemSelected,
-                    items: items,
-                    selected: selected,
-                    currentSelectedIndex: currentSelectedIndex,
-                  ),
+                    index: index,
+                  )
                 ],
               ),
             )
           ],
         );
       }),
-    );
-  }
-}
-
-class RouletteWidget extends StatefulWidget {
-  final List<bool> itemSelected;
-  final BoxConstraints constraints;
-  final List<Widget> items;
-  final StreamController<int> selected;
-  int currentSelectedIndex;
-  RouletteWidget(
-      {super.key,
-      required this.itemSelected,
-      required this.constraints,
-      required this.items,
-      required this.selected,
-      required this.currentSelectedIndex});
-
-  @override
-  State<RouletteWidget> createState() => _RouletteWidgetState();
-}
-
-class _RouletteWidgetState extends State<RouletteWidget> {
-  @override
-  Widget build(BuildContext context) {
-    return Transform.rotate(
-      angle: 90 * (pi / 180), // Convert degrees to radians
-      child: Container(
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border:
-                Border.all(width: 5, color: Color.fromRGBO(190, 23, 23, 1))),
-        child: Container(
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border:
-                Border.all(width: 15, color: Color.fromRGBO(238, 33, 33, 1)),
-          ),
-          child: Container(
-            decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                    width: 5, color: Color.fromRGBO(190, 23, 23, 1))),
-            child: FortuneWheel(
-              indicators: [
-                FortuneIndicator(
-                  child: Transform.rotate(
-                    angle: 265 * (pi / 180),
-                    child: Image.asset(
-                      "images/center.png",
-                      height: widget.constraints.maxHeight * 0.1,
-                      width: widget.constraints.maxWidth * 0.1,
-                      alignment: Alignment.center,
-                    ),
-                    alignment: Alignment.center,
-                  ),
-                )
-              ],
-              animateFirst: false,
-              selected: widget.selected.stream,
-              items: [
-                for (int index = 0; index < widget.items.length; index++)
-                  FortuneItem(
-                    child: widget.items[index],
-                    style: FortuneItemStyle(
-                      color: widget.itemSelected[index]
-                          ? Color.fromRGBO(228, 232, 159, 1)
-                          : Color.fromRGBO(210, 198, 153, 1),
-                    ),
-                  ),
-              ],
-              onAnimationStart: () {
-                Future.microtask(() {
-                  setState(() {
-                    widget.itemSelected[widget.currentSelectedIndex] = false;
-                  });
-                });
-              },
-              onFocusItemChanged: (index) {
-                widget.currentSelectedIndex = index;
-              },
-              onAnimationEnd: () {
-                Future.microtask(() {
-                  setState(() {
-                    widget.itemSelected[widget.currentSelectedIndex] = true;
-                  });
-                });
-                print(
-                    'Selected Item: ${widget.currentSelectedIndex.toString()}');
-              },
-            ),
-          ),
-        ),
-      ),
     );
   }
 }
@@ -402,7 +157,7 @@ class ImageSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      "images/slot.png",
+      "images/slot_full.png",
     );
   }
 }
@@ -413,7 +168,7 @@ class ImagePokies extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      "images/pokies.png",
+      "images/Pokies (1).png",
     );
   }
 }
@@ -424,25 +179,19 @@ class ImageRoulette extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Image.asset(
-      "images/roulette.png",
+      "images/Roulette (1).png",
     );
   }
 }
 
 class ButtonPlay extends StatefulWidget {
-  final List<bool> itemSelected;
+  final int index;
   final BoxConstraints constraints;
-  final List<Widget> items;
-  final StreamController<int> selected;
-  final int currentSelectedIndex;
 
   const ButtonPlay({
     super.key,
     required this.constraints,
-    required this.itemSelected,
-    required this.items,
-    required this.selected,
-    required this.currentSelectedIndex,
+    required this.index,
   });
 
   @override
@@ -458,12 +207,20 @@ class _ButtonPlayState extends State<ButtonPlay> {
           width: widget.constraints.maxWidth * 0.25,
           child: ElevatedButton(
               onPressed: () async {
-                Future.microtask(() {
-                  setState(() {
-                    widget.itemSelected[widget.currentSelectedIndex] = false;
-                  });
-                });
-                widget.selected.add(Fortune.randomInt(0, widget.items.length));
+                context.read<FortuneCubit>().win = 0;
+
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (_) => RoulettePlayPage(index: widget.index)));
+                // if(index == 1){
+                //   Navigator.push(context, MaterialPageRoute(builder: (_)=>Container()));
+                // }
+                // Future.microtask(() {
+                //   setState(() {
+                //     widget.itemSelected[widget.currentSelectedIndex] = false;
+                //   });
+                // });
               },
               style: ButtonStyle(
                   backgroundColor: const MaterialStatePropertyAll(
@@ -494,84 +251,25 @@ class BackButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Flexible(
-        child: IconButton(
-            iconSize: constraints.maxWidth * 0.06,
-            onPressed: () {},
-            style: ButtonStyle(
-                backgroundColor: const MaterialStatePropertyAll(
-                    Color.fromRGBO(38, 121, 228, 1)),
-                shape: MaterialStatePropertyAll(RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16))),
-                side: const MaterialStatePropertyAll(BorderSide(
-                    width: 7, color: Color.fromRGBO(24, 64, 134, 1)))),
-            icon: const Icon(
-              Icons.arrow_back,
-              color: Colors.white,
-            )));
-  }
-}
-
-class PrevButton extends StatelessWidget {
-  final BoxConstraints constraints;
-
-  const PrevButton({
-    super.key,
-    required this.constraints,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        iconSize: constraints.maxWidth * 0.06,
-        onPressed: () {},
-        style: ButtonStyle(
-            backgroundColor:
-                const MaterialStatePropertyAll(Color.fromRGBO(238, 33, 33, 1)),
-            side: const MaterialStatePropertyAll(
-              BorderSide(
-                width: 7,
-                color: Color.fromRGBO(190, 23, 23, 1),
-              ),
-            ),
-            shape: MaterialStatePropertyAll(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            )),
-        icon: const Icon(
-          Icons.arrow_back,
-          color: Colors.white,
-        ));
-  }
-}
-
-class NextButton extends StatelessWidget {
-  final BoxConstraints constraints;
-
-  const NextButton({
-    super.key,
-    required this.constraints,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        iconSize: constraints.maxWidth * 0.06,
-        onPressed: () {},
-        style: ButtonStyle(
-            backgroundColor:
-                const MaterialStatePropertyAll(Color.fromRGBO(238, 33, 33, 1)),
-            side: const MaterialStatePropertyAll(
-              BorderSide(
-                width: 7,
-                color: Color.fromRGBO(190, 23, 23, 1),
-              ),
-            ),
-            shape: MaterialStatePropertyAll(
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            )),
-        icon: const Icon(
-          Icons.arrow_forward,
-          color: Colors.white,
-        ));
+        child: Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 35),
+      child: IconButton(
+          iconSize: constraints.maxWidth * 0.06,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          style: ButtonStyle(
+              backgroundColor: const MaterialStatePropertyAll(
+                  Color.fromRGBO(38, 121, 228, 1)),
+              shape: MaterialStatePropertyAll(RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16))),
+              side: const MaterialStatePropertyAll(
+                  BorderSide(width: 7, color: Color.fromRGBO(24, 64, 134, 1)))),
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.white,
+          )),
+    ));
   }
 }
 

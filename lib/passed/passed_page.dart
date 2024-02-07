@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fortune_app/cubit/fortune_cubit.dart';
+import 'package:fortune_app/mainPage/page/main_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PassedPage extends StatelessWidget {
-  const PassedPage({super.key});
+  final int index;
+  const PassedPage({super.key, required this.index});
 
   @override
   Widget build(BuildContext context) {
@@ -10,9 +14,13 @@ class PassedPage extends StatelessWidget {
       body: LayoutBuilder(
         builder: (contex, constraints) {
           return Stack(children: [
-            ImageSlotBackground(
-              constraints: constraints,
-            ),
+            index == 0
+                ? ImageRouletteBackground(constraints: constraints)
+                : (index == 1
+                    ? ImageSlotBackground(
+                        constraints: constraints,
+                      )
+                    : ImagePokiesBackground(constraints: constraints)),
             Padding(
               padding: const EdgeInsets.only(left: 50, bottom: 50),
               child: Row(
@@ -23,15 +31,30 @@ class PassedPage extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Spacer(),
-                      TextSpotSlot(constraints: constraints),
+                      index == 0
+                          ? TextSpotRoulette(
+                              constraints: constraints,
+                            )
+                          : (index == 1
+                              ? TextSpotSlot(
+                                  constraints: constraints,
+                                )
+                              : TextSpotPokies(constraints: constraints)),
                       SizedBox(
                         height: 32,
                       ),
                       Flexible(
-                          child: Image.asset(
-                        "images/slot_full.png",
-                        width: constraints.maxWidth * 0.3,
-                      )),
+                          child: index == 0
+                              ? ImageRoulette(
+                                  constraints: constraints,
+                                )
+                              : (index == 1
+                                  ? ImageSlot(
+                                      constraints: constraints,
+                                    )
+                                  : ImagePokies(
+                                      constraints: constraints,
+                                    ))),
                       SizedBox(
                         height: 10,
                       ),
@@ -40,8 +63,9 @@ class PassedPage extends StatelessWidget {
                 ],
               ),
             ),
-             Align(
-              alignment: AlignmentGeometry.lerp(Alignment.bottomCenter, Alignment.bottomRight, 0.75)!,
+            Align(
+              alignment: AlignmentGeometry.lerp(
+                  Alignment.bottomCenter, Alignment.bottomRight, 0.75)!,
               child: Flexible(
                 child: Image.asset(
                   "images/tigerV2.png",
@@ -62,7 +86,7 @@ class PassedPage extends StatelessWidget {
                       constraints: constraints,
                     ),
                     Text(
-                      "8,000",
+                      context.read<FortuneCubit>().win.toString(),
                       style: GoogleFonts.roboto(
                           fontWeight: FontWeight.w700,
                           fontSize: constraints.maxHeight * 0.11,
@@ -87,14 +111,13 @@ class PassedPage extends StatelessWidget {
                 ),
               ),
             ),
-           
             Align(
               alignment: Alignment.bottomRight,
               child: Flexible(
                 child: Image.asset(
-                  "images/win.png",
-                 width: constraints.maxWidth * 0.2,
-                    height: constraints.maxHeight * 0.6,
+                  "images/Win (2).png",
+                  width: constraints.maxWidth * 0.2,
+                  height: constraints.maxHeight * 0.6,
                 ),
               ),
             )
@@ -119,7 +142,11 @@ class ButtonPlayAgain extends StatelessWidget {
       height: constraints.maxHeight * 0.12,
       width: constraints.maxWidth * 0.25,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          context.read<FortuneCubit>().win = 0;
+
+          Navigator.pop(context);
+        },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(
             const Color.fromRGBO(238, 33, 33, 1),
@@ -149,6 +176,50 @@ class ButtonPlayAgain extends StatelessWidget {
   }
 }
 
+class ImageSlot extends StatelessWidget {
+  final BoxConstraints constraints;
+
+  const ImageSlot({
+    super.key,
+    required this.constraints,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      "images/slot_full.png",
+      width: constraints.maxWidth * 0.3,
+    );
+  }
+}
+
+class ImagePokies extends StatelessWidget {
+  final BoxConstraints constraints;
+
+  const ImagePokies({super.key, required this.constraints});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      "images/Pokies (1).png",
+      width: constraints.maxWidth * 0.3,
+    );
+  }
+}
+
+class ImageRoulette extends StatelessWidget {
+  final BoxConstraints constraints;
+  const ImageRoulette({super.key, required this.constraints});
+
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset(
+      "images/Roulette (1).png",
+      width: constraints.maxWidth * 0.3,
+    );
+  }
+}
+
 class ButtonMainMenu extends StatelessWidget {
   final BoxConstraints constraints;
 
@@ -163,7 +234,10 @@ class ButtonMainMenu extends StatelessWidget {
       height: constraints.maxHeight * 0.12,
       width: constraints.maxWidth * 0.25,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => MainPage()));
+        },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(
             const Color.fromRGBO(238, 33, 33, 1),

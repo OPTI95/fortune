@@ -1,8 +1,32 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:fortune_app/cubit/fortune_cubit.dart';
+import 'package:fortune_app/daily/page/daily_page.dart';
+import 'package:fortune_app/settings/page/settings_page.dart';
+import 'package:fortune_app/spots/page/spots_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class MainPage extends StatelessWidget {
+class MainPage extends StatefulWidget {
   const MainPage({super.key});
+
+  @override
+  State<MainPage> createState() => _MainPageState();
+}
+
+class _MainPageState extends State<MainPage> {
+  bool isOpen = false;
+  @override
+  void initState() {
+    final time = context.read<FortuneCubit>().expiryTime;
+    if (time != null && time.isAfter(DateTime.now())) {
+      isOpen = true;
+    } else {
+      isOpen = false;
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +47,7 @@ class MainPage extends StatelessWidget {
               constraints: constraints,
             ),
             DailyRewardWidgets(
+              isOpen: isOpen,
               constraints: constraints,
             )
           ],
@@ -33,11 +58,13 @@ class MainPage extends StatelessWidget {
 }
 
 class DailyRewardWidgets extends StatelessWidget {
+  final bool isOpen;
   final BoxConstraints constraints;
 
   const DailyRewardWidgets({
     super.key,
     required this.constraints,
+    required this.isOpen,
   });
 
   @override
@@ -47,16 +74,17 @@ class DailyRewardWidgets extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // ImageOpenDaily(
-            //   constraints: constraints,
-            // ),
-            ImageCloseDaily(
-              constraints: constraints,
-            ),
+            isOpen
+                ? ImageOpenDaily(
+                    constraints: constraints,
+                  )
+                : ImageCloseDaily(
+                    constraints: constraints,
+                  ),
             TextDailyReward(
               constraints: constraints,
             ),
-            // TextDailyRewardOpened(constraints: constraints),
+            //TextDailyRewardOpened(constraints: constraints),
             TextDailyRewardIsReady(
               constraints: constraints,
             ),
@@ -259,7 +287,10 @@ class ButtonOpenReward extends StatelessWidget {
         height: constraints.maxHeight * 0.13,
         width: constraints.maxWidth * 0.22,
         child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => DailyPage()));
+            },
             style: ButtonStyle(
                 backgroundColor: const MaterialStatePropertyAll(
                     Color.fromRGBO(38, 121, 228, 1)),
@@ -448,7 +479,9 @@ class ExitButton extends StatelessWidget {
         height: constraints.maxHeight * 0.15,
         width: constraints.maxWidth * 0.25,
         child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              exit(0);
+            },
             style: ButtonStyle(
                 backgroundColor: const MaterialStatePropertyAll(
                     Color.fromRGBO(238, 33, 33, 1)),
@@ -480,7 +513,10 @@ class SpotsButton extends StatelessWidget {
         height: constraints.maxHeight * 0.15,
         width: constraints.maxWidth * 0.25,
         child: ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (_) => SpotsPage()));
+            },
             style: ButtonStyle(
                 backgroundColor: const MaterialStatePropertyAll(
                     Color.fromRGBO(238, 33, 33, 1)),
@@ -543,7 +579,10 @@ class SettingButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: () {},
+      onTap: () {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (_) => SettingsPage()));
+      },
       child: Container(
         height: constraints.maxHeight * 0.12,
         width: constraints.maxWidth * 0.1,

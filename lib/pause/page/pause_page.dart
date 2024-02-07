@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:fortune_app/mainPage/page/main_page.dart';
+import 'package:fortune_app/settings/page/settings_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PausePage extends StatefulWidget {
@@ -22,7 +24,6 @@ class _PausePageState extends State<PausePage> {
             ButtonsVolumeAndSetting(
               constraints: constraints,
             ),
-           
             Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 32),
@@ -37,11 +38,17 @@ class _PausePageState extends State<PausePage> {
                     ),
                     const SizedBox(height: 12),
                     const Spacer(),
-                    ButtonContinue(constraints: constraints,),
+                    ButtonContinue(
+                      constraints: constraints,
+                    ),
                     const SizedBox(height: 12),
-                    ButtonToMain(constraints: constraints,),
+                    ButtonToMain(
+                      constraints: constraints,
+                    ),
                     const SizedBox(height: 12),
-                    ButtonExit(constraints: constraints,),
+                    ButtonExit(
+                      constraints: constraints,
+                    ),
                   ],
                 ),
               ),
@@ -67,7 +74,9 @@ class ButtonExit extends StatelessWidget {
       height: constraints.maxHeight * 0.12,
       width: constraints.maxWidth * 0.25,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          exit(0);
+        },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(
             const Color.fromRGBO(238, 33, 33, 1),
@@ -111,7 +120,10 @@ class ButtonToMain extends StatelessWidget {
       height: constraints.maxHeight * 0.12,
       width: constraints.maxWidth * 0.25,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.push(
+              context, MaterialPageRoute(builder: (_) => MainPage()));
+        },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(
             const Color.fromRGBO(238, 33, 33, 1),
@@ -155,7 +167,9 @@ class ButtonContinue extends StatelessWidget {
       height: constraints.maxHeight * 0.12,
       width: constraints.maxWidth * 0.25,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.pop(context);
+        },
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(
             const Color.fromRGBO(238, 33, 33, 1),
@@ -267,7 +281,10 @@ class SettingButton extends StatelessWidget {
     return Flexible(
       child: IconButton(
           iconSize: constraints.maxWidth * 0.05,
-          onPressed: () {},
+          onPressed: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (_) => SettingsPage()));
+          },
           style: ButtonStyle(
               backgroundColor: const MaterialStatePropertyAll(
                   Color.fromRGBO(238, 33, 33, 1)),
