@@ -18,6 +18,36 @@ class RoulettePlayPage extends StatefulWidget {
 }
 
 class _RoulettePlayPageState extends State<RoulettePlayPage> {
+  Map<int, Image> images = {
+    1: Image.asset('images/gift_1.png'),
+    2: Image.asset('images/gift_2.png'),
+    3: Image.asset('images/gift_3.png'),
+    4: Image.asset('images/gift_4.png'),
+  };
+  List<List<int>> shuffledImagesList = [];
+  List<List<int>> shuffledImagesList2 = [];
+
+  @override
+  void initState() {
+    super.initState();
+    shuffledImagesList = List.generate(4, (index) => [1, 2, 3, 4]);
+    shuffledImagesList2 = List.generate(3, (index) => [1, 2, 3, 4]);
+
+    context.read<FortuneCubit>().win = 0;
+  }
+
+  void shuffleImages() {
+    setState(() {
+      shuffledImagesList.forEach((list) => list.shuffle());
+    });
+  }
+
+  void shuffleImages2() {
+    setState(() {
+      shuffledImagesList2.forEach((list) => list.shuffle());
+    });
+  }
+
   StreamController<int> selected = StreamController<int>();
   List<List<int>> imageIndexes = [
     [1, 2, 3, 4],
@@ -39,12 +69,7 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
     super.dispose();
   }
 
-  @override
-  void initState() {
-    context.read<FortuneCubit>().win = 0;
-    super.initState();
-  }
-
+  int summa = 10;
   @override
   Widget build(BuildContext context) {
     return Scaffold(body: LayoutBuilder(builder: (contex, constraints) {
@@ -142,7 +167,7 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
           child: Row(
             children: [
               Flexible(
-                  flex: 2,
+                  flex: 1,
                   child: Stack(
                     alignment: Alignment.topCenter,
                     children: [
@@ -161,11 +186,8 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
                       )
                     ],
                   )),
-              Spacer(
-                flex: 1,
-              ),
               Flexible(
-                  flex: 3,
+                  flex: 2,
                   child: widget.index == 0
                       ? RouletteWidget(
                           constraints: constraints,
@@ -174,19 +196,22 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
                           items: items,
                           currentSelectedIndex: currentSelectedIndex)
                       : (widget.index == 1
-                          ? ImageGrid(
+                          ? PokiesWidget(
+                              shuffledImagesList: shuffledImagesList,
+                              images: images,
                               constraints: constraints,
-                              imageIndexes: imageIndexes,
                             )
-                          : ImageSpotGrid(
+                          // ImageGrid(
+                          //     constraints: constraints,
+                          //     imageIndexes: imageIndexes,
+                          //   )
+                          : SpotWidget(
+                              shuffledImagesList: shuffledImagesList2,
+                              images: images,
                               constraints: constraints,
-                              imageIndexes: imageIndexes2,
                             ))),
-              Spacer(
-                flex: 1,
-              ),
               Flexible(
-                flex: 2,
+                flex: 1,
                 child: Column(
                   children: [
                     Align(
@@ -216,9 +241,7 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
                                   size: constraints.maxHeight * 0.05,
                                   color: Colors.white))),
                     ),
-                    SizedBox(
-                      height: 23,
-                    ),
+                    Spacer(),
                     Stack(
                       alignment: Alignment.bottomCenter,
                       children: [
@@ -255,8 +278,17 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
                           child: SizedBox(
                               child: ElevatedButton(
                                   onPressed: () async {
-                                    selected.add(
-                                        Fortune.randomInt(0, items.length));
+                                    if (summa != 10) {
+                                      summa -= 10;
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                              duration:
+                                                  Duration(milliseconds: 500),
+                                              content: Text(
+                                                "Ваша ставка: ${summa}",
+                                                style: TextStyle(fontSize: 32),
+                                              )));
+                                    }
                                   },
                                   style: ButtonStyle(
                                       backgroundColor:
@@ -284,32 +316,50 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
                         ),
                         Flexible(
                           child: SizedBox(
-                              child: ElevatedButton(
-                                  onPressed: () async {
-                                    selected.add(
-                                        Fortune.randomInt(0, items.length));
-                                  },
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          const MaterialStatePropertyAll(
-                                              Color.fromRGBO(238, 33, 33, 1)),
-                                      shape: MaterialStatePropertyAll(
-                                          RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(16))),
-                                      side: const MaterialStatePropertyAll(
-                                          BorderSide(
-                                              width: 7,
-                                              color: Color.fromRGBO(
-                                                  190, 23, 23, 1)))),
-                                  child: Text(
-                                    "+",
-                                    style: GoogleFonts.roboto(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w700,
-                                        fontSize:
-                                            constraints.maxHeight * 0.065),
-                                  ))),
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                int bal = context.read<FortuneCubit>().balance;
+                                if (bal > summa) {
+                                  summa += 10;
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                          duration: Duration(milliseconds: 500),
+                                          content: Text(
+                                            "Ваша ставка: ${summa}",
+                                            style: TextStyle(fontSize: 32),
+                                          )));
+                                } else {
+                                  ScaffoldMessenger.of(context)
+                                      .showSnackBar(SnackBar(
+                                          duration: Duration(milliseconds: 500),
+                                          content: Text(
+                                            "Это ваша максимальная ставка!",
+                                            style: TextStyle(fontSize: 32),
+                                          )));
+                                }
+                              },
+                              style: ButtonStyle(
+                                  backgroundColor:
+                                      const MaterialStatePropertyAll(
+                                          Color.fromRGBO(238, 33, 33, 1)),
+                                  shape: MaterialStatePropertyAll(
+                                      RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16))),
+                                  side: const MaterialStatePropertyAll(
+                                      BorderSide(
+                                          width: 7,
+                                          color:
+                                              Color.fromRGBO(190, 23, 23, 1)))),
+                              child: Text(
+                                "+",
+                                style: GoogleFonts.roboto(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: constraints.maxHeight * 0.065),
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
@@ -319,53 +369,36 @@ class _RoulettePlayPageState extends State<RoulettePlayPage> {
                         width: constraints.maxWidth * 0.25,
                         child: ElevatedButton(
                             onPressed: () async {
+                              context.read<FortuneCubit>().removeBalance(summa);
                               if (widget.index == 0) {
                                 selected
                                     .add(Fortune.randomInt(0, items.length));
                               } else if (widget.index == 1) {
                                 setState(() {
-                                  int index = 0;
-
-                                  imageIndexes.forEach((row) {
-                                    row.shuffle();
-
-                                    if (index == 2) {
-                                      final row2 = List.of(row);
-                                      row2.forEach((element) {
-                                        context
-                                            .read<FortuneCubit>()
-                                            .spotePlay(element);
-                                      });
-                                    }
-                                    index++;
+                                  shuffleImages();
+                                  shuffledImagesList.forEach((row) {
+                                    context
+                                        .read<FortuneCubit>()
+                                        .spotePlay(row[2]);
                                   });
                                 });
                                 await Future.delayed(
-                                    Duration(milliseconds: 500));
+                                    Duration(milliseconds: 1500));
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: (_) => PassedPage(index: 1)));
                               } else if (widget.index == 2) {
                                 setState(() {
-                                  int index = 0;
-
-                                  imageIndexes2.forEach((row) {
-                                    row.shuffle();
-
-                                    if (index == 1) {
-                                      final row2 = List.of(row);
-                                      row2.forEach((element) {
-                                        context
-                                            .read<FortuneCubit>()
-                                            .spotePlay(element);
-                                      });
-                                    }
-                                    index++;
+                                  shuffleImages2();
+                                  shuffledImagesList2.forEach((row) {
+                                    context
+                                        .read<FortuneCubit>()
+                                        .spotePlay(row[1]);
                                   });
                                 });
                                 await Future.delayed(
-                                    Duration(milliseconds: 500));
+                                    Duration(milliseconds: 1500));
 
                                 Navigator.push(
                                     context,
@@ -640,6 +673,195 @@ class _RouletteWidgetState extends State<RouletteWidget> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class SpotWidget extends StatelessWidget {
+  final BoxConstraints constraints;
+  const SpotWidget({
+    super.key,
+    required this.shuffledImagesList,
+    required this.images,
+    required this.constraints,
+  });
+
+  final List<List<int>> shuffledImagesList;
+  final Map<int, Image> images;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset("images/Group 79.png"),
+        Padding(
+          padding: EdgeInsets.only(left: constraints.maxWidth * 0.05),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var shuffledImages in shuffledImagesList)
+                Flexible(
+                  child: Container(
+                    height: constraints.maxWidth * 0.26,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(196, 199, 134, 1),
+                      border: Border(
+                        right: BorderSide(
+                          width: constraints.maxWidth * 0.005,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                        left: BorderSide(
+                          width: constraints.maxWidth * 0.005,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                        bottom: BorderSide(
+                          width: constraints.maxWidth * 0.01,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                        top: BorderSide(
+                          width: constraints.maxWidth * 0.01,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                      ),
+                    ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        );
+                      },
+                      child: GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        key: UniqueKey(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          mainAxisExtent: constraints.maxWidth * 0.08,
+                        ),
+                        itemCount: shuffledImages.length,
+                        itemBuilder: (context, index) {
+                          if (index == 3) {
+                            return Container();
+                          } else {
+                            final int imageId = shuffledImages[index];
+                            return Container(
+                              color: index == 1
+                                  ? Color.fromRGBO(228, 232, 159, 1)
+                                  : Colors.transparent,
+                              child: FittedBox(
+                                fit: BoxFit.contain,
+                                child: images[imageId]!,
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+              Image.asset(
+                "images/Group 76.png",
+                width: constraints.maxWidth * 0.05,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class PokiesWidget extends StatelessWidget {
+  final BoxConstraints constraints;
+  const PokiesWidget({
+    super.key,
+    required this.shuffledImagesList,
+    required this.images,
+    required this.constraints,
+  });
+
+  final List<List<int>> shuffledImagesList;
+  final Map<int, Image> images;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Image.asset("images/Group 79.png"),
+        Padding(
+          padding:
+              EdgeInsets.symmetric(horizontal: constraints.maxWidth * 0.05),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var shuffledImages in shuffledImagesList)
+                Flexible(
+                  child: Container(
+                    height: constraints.maxWidth * 0.35,
+                    decoration: BoxDecoration(
+                      color: Color.fromRGBO(196, 199, 134, 1),
+                      border: Border(
+                        right: BorderSide(
+                          width: constraints.maxWidth * 0.005,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                        left: BorderSide(
+                          width: constraints.maxWidth * 0.005,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                        bottom: BorderSide(
+                          width: constraints.maxWidth * 0.01,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                        top: BorderSide(
+                          width: constraints.maxWidth * 0.01,
+                          color: Color.fromRGBO(190, 23, 23, 1),
+                        ),
+                      ),
+                    ),
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 500),
+                      transitionBuilder:
+                          (Widget child, Animation<double> animation) {
+                        return ScaleTransition(
+                          scale: animation,
+                          child: child,
+                        );
+                      },
+                      child: GridView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        key: UniqueKey(),
+                        shrinkWrap: true,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 1,
+                          mainAxisExtent: constraints.maxWidth * 0.08,
+                        ),
+                        itemCount: shuffledImages.length,
+                        itemBuilder: (context, index) {
+                          final int imageId = shuffledImages[index];
+                          return Container(
+                            color: index == 2
+                                ? Color.fromRGBO(228, 232, 159, 1)
+                                : Colors.transparent,
+                            child: FittedBox(
+                              fit: BoxFit.contain,
+                              child: images[imageId]!,
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -28,9 +28,11 @@ class PassedPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Spacer(),
+                      Spacer(
+                        flex: 2,
+                      ),
                       index == 0
                           ? TextSpotRoulette(
                               constraints: constraints,
@@ -43,7 +45,8 @@ class PassedPage extends StatelessWidget {
                       SizedBox(
                         height: 32,
                       ),
-                      Flexible(
+                      Expanded(
+                        flex: 5,
                           child: index == 0
                               ? ImageRoulette(
                                   constraints: constraints,
@@ -58,6 +61,7 @@ class PassedPage extends StatelessWidget {
                       SizedBox(
                         height: 10,
                       ),
+                      Spacer(),
                     ],
                   ),
                 ],

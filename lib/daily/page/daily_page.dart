@@ -19,7 +19,7 @@ class _DailyPageState extends State<DailyPage> {
     final time = context.read<FortuneCubit>().expiryTime;
     if (time != null && time.isAfter(DateTime.now())) {
       isOpen = true;
-    }else{
+    } else {
       isOpen = false;
     }
     super.initState();
@@ -78,9 +78,6 @@ class _DailyPageState extends State<DailyPage> {
                                     color: Colors.white,
                                   ),
                                 ),
-                                SizedBox(
-                                  height: 30,
-                                ),
                                 TextDailyRewardOpened(constraints: constraints),
                               ],
                             )
@@ -95,11 +92,11 @@ class _DailyPageState extends State<DailyPage> {
                           onPressed: isOpen
                               ? null
                               : () async {
+                                  context.read<FortuneCubit>().addBalance(200);
+                                  await context.read<FortuneCubit>().saveDate();
                                   setState(() {
                                     isOpen = true;
                                   });
-                                  context.read<FortuneCubit>().addBalance(200);
-                                  await context.read<FortuneCubit>().saveDate();
                                 },
                           style: ButtonStyle(
                               backgroundColor: MaterialStatePropertyAll(isOpen
@@ -159,7 +156,11 @@ class _TextDailyRewardOpenedState extends State<TextDailyRewardOpened> {
   void _startTimer() {
     DateTime now = DateTime.now();
     DateTime? endOfDay = context.read<FortuneCubit>().expiryTime;
-    _duration = endOfDay!.difference(now);
+    if (endOfDay != null) {
+      _duration = endOfDay!.difference(now);
+    }else{
+      endOfDay = DateTime.now();
+    }
 
     _timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
