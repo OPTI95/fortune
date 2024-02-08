@@ -48,9 +48,6 @@ class _DailyPageState extends State<DailyPage> {
                   ),
                 ),
               ),
-              Spacer(
-                flex: 1,
-              ),
               Flexible(
                   flex: 2,
                   child: isOpen
